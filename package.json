@@ -1,0 +1,77 @@
+{
+  "name": "agent-flow",
+  "version": "1.0.0",
+  "description": "A TypeScript framework for building agentic AI workflows with tool calling, multi-step reasoning, persistent memory, and structured outputs",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "import": "./dist/tools/index.mjs",
+      "require": "./dist/tools/index.js"
+    },
+    "./providers": {
+      "types": "./dist/providers/index.d.ts",
+      "import": "./dist/providers/index.mjs",
+      "require": "./dist/providers/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:ui": "cd src/ui && npm run build",
+    "dev": "tsup --watch",
+    "dev:ui": "cd src/ui && npm run dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "agentic",
+    "llm",
+    "tool-calling",
+    "openai",
+    "anthropic",
+    "workflow",
+    "framework",
+    "typescript"
+  ],
+  "author": "George Castillo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gcasti256/agent-flow"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.23.8",
+    "openai": "^4.73.0",
+    "@anthropic-ai/sdk": "^0.32.1",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.16.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "prettier": "^3.4.2",
+    "@types/node": "^22.10.2",
+    "@types/uuid": "^10.0.0"
+  }
+}
