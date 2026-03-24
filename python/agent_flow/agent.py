@@ -16,7 +16,6 @@ from agent_flow.types import (
     Message,
     Provider,
     Role,
-    ToolCall,
     ToolResult,
 )
 
@@ -67,7 +66,7 @@ class Agent:
     async def run(self, input_text: str, conversation_id: str | None = None) -> AgentRunResult:
         """Run the agent with a user message through the think→act→observe loop."""
         start_time = time.time()
-        conv_id = conversation_id or str(uuid.uuid4())
+        _conv_id = conversation_id or str(uuid.uuid4())
         all_tool_results: list[ToolResult] = []
         total_tokens = 0
         iterations = 0

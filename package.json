@@ -30,7 +30,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src/ --ext .ts,.tsx",
+    "lint": "eslint src/",
     "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
@@ -70,6 +70,7 @@
     "eslint": "^9.16.0",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
+    "typescript-eslint": "^8.18.0",
     "prettier": "^3.4.2",
     "@types/node": "^22.10.2",
     "@types/uuid": "^10.0.0"

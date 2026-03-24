@@ -26,30 +26,36 @@ A TypeScript + Python framework for building agentic AI workflows with tool call
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                      Agent Runner                         │
-│                                                          │
-│  ┌─────────┐    ┌─────────┐    ┌──────────┐             │
-│  │  Think   │───▶│   Act   │───▶│ Observe  │──┐          │
-│  │ (LLM)   │    │ (Tools) │    │ (Results) │  │          │
-│  └─────────┘    └─────────┘    └──────────┘  │          │
-│       ▲                                       │          │
-│       └───────────────────────────────────────┘          │
-│                                                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
-│  │   Memory      │  │   Provider   │  │   Events     │   │
-│  │ conversation  │  │  openai /    │  │  lifecycle   │   │
-│  │ working       │  │  anthropic   │  │  streaming   │   │
-│  │ persistent    │  │              │  │              │   │
-│  └──────────────┘  └──────────────┘  └──────────────┘   │
-│                                                          │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │                  Tool Registry                     │   │
-│  │  calculator │ web_search │ file_ops │ http_request │   │
-│  │                  + custom tools                    │   │
-│  └──────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph runner["Agent Runner Loop"]
+        direction LR
+        Think["🧠 Think\n(LLM Reasoning)"] --> Act["⚡ Act\n(Tool Execution)"]
+        Act --> Observe["👁 Observe\n(Parse Results)"]
+        Observe --> Think
+    end
+
+    subgraph core["Core Systems"]
+        direction LR
+        Memory["Memory\nConversation · Working · Persistent"]
+        Provider["Provider\nOpenAI · Anthropic"]
+        Events["Events\nLifecycle · Streaming"]
+    end
+
+    subgraph tools["Tool Registry"]
+        direction LR
+        T1["calculator"] ~~~ T2["web_search"] ~~~ T3["file_ops"] ~~~ T4["http_request"] ~~~ T5["+ custom"]
+    end
+
+    runner --> core
+    runner --> tools
+
+    style runner fill:#1a1a2e,stroke:#6366f1,color:#e2e8f0
+    style core fill:#16213e,stroke:#0ea5e9,color:#e2e8f0
+    style tools fill:#1a1a2e,stroke:#22c55e,color:#e2e8f0
+    style Think fill:#312e81,stroke:#818cf8,color:#e2e8f0
+    style Act fill:#1e3a5f,stroke:#38bdf8,color:#e2e8f0
+    style Observe fill:#14532d,stroke:#4ade80,color:#e2e8f0
 ```
 
 ## Quick Start
@@ -266,6 +272,28 @@ Features:
 | `fileReadTool` | Read files from filesystem |
 | `fileWriteTool` | Write files to filesystem |
 | `httpRequestTool` | Make HTTP requests |
+
+## Production at Scale
+
+agent-flow is designed with enterprise deployment patterns in mind. Here's how each component maps to production infrastructure:
+
+| Component | Development | Production at Scale |
+|-----------|------------|-------------------|
+| **Agent Runtime** | Single process | Horizontally scaled workers behind a job queue (Bull, SQS, Cloud Tasks) |
+| **Memory Store** | File-system JSON | Redis Cluster or DynamoDB for distributed conversation state |
+| **Tool Execution** | In-process | Sandboxed execution with per-tool timeouts, circuit breakers, and rate limits |
+| **Provider Layer** | Direct API calls | Connection pooling, automatic failover between providers, cost-based routing |
+| **Event System** | In-memory callbacks | Redis Pub/Sub or Kafka for cross-service event propagation |
+| **Observability** | Console logger | Structured JSON logs → ELK/Datadog, OpenTelemetry traces, Prometheus metrics |
+
+### Why This Matters in Financial Services
+
+In regulated environments like banking and payments:
+
+- **Auditability** — Every agent decision, tool call, and LLM response is logged as a structured event. The event system provides a complete audit trail from user input to final output.
+- **Deterministic Fallbacks** — The `maxIterations` guard and abort signal support ensure agents never run unbounded. Circuit breakers prevent cascading failures when upstream providers degrade.
+- **Data Isolation** — Working memory is scoped per-execution; conversation memory is scoped per-conversation ID. No cross-tenant data leakage by design.
+- **Cost Control** — Token counting on every interaction enables real-time cost monitoring and per-agent budget enforcement.
 
 ## Project Structure
 
