@@ -1,4 +1,5 @@
 import { z, ZodType } from 'zod';
+import type { ModelProviderInterface } from '../providers/base.js';
 
 // ─── Model Provider Types ─────────────────────────────────────────────
 
@@ -99,7 +100,7 @@ export interface AgentConfig {
   systemPrompt: string;
   model?: ModelConfig;
   /** Inject a custom model provider (useful for testing). Overrides `model`. */
-  provider?: unknown;
+  provider?: ModelProviderInterface;
   tools?: ToolDefinition[];
   maxIterations?: number;
   memoryStore?: MemoryStore;

@@ -17,6 +17,9 @@ SAFE_OPS = {
 }
 
 
+MAX_EXPONENT = 1000  # Prevent DoS via huge exponents like 2**999999999
+
+
 def _safe_eval(node: ast.AST) -> float:
     """Safely evaluate an AST math expression."""
     if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
@@ -24,6 +27,11 @@ def _safe_eval(node: ast.AST) -> float:
     if isinstance(node, ast.BinOp) and type(node.op) in SAFE_OPS:
         left = _safe_eval(node.left)
         right = _safe_eval(node.right)
+        if isinstance(node.op, ast.Pow):
+            if abs(right) > MAX_EXPONENT:
+                raise ValueError(
+                    f"Exponent too large: {right} (max {MAX_EXPONENT})"
+                )
         return SAFE_OPS[type(node.op)](left, right)
     if isinstance(node, ast.UnaryOp) and type(node.op) in SAFE_OPS:
         return SAFE_OPS[type(node.op)](_safe_eval(node.operand))

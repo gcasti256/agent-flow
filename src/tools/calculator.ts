@@ -61,6 +61,9 @@ function tokenize(expr: string): Token[] {
 }
 
 function evaluateExpression(expr: string): number {
+  if (expr.length > 1000) {
+    throw new Error('Expression too long (max 1000 characters)');
+  }
   const tokens = tokenize(expr);
   let pos = 0;
 
@@ -93,6 +96,9 @@ function evaluateExpression(expr: string): number {
     while (pos < tokens.length && tokens[pos].type === 'op' && tokens[pos].value === '^') {
       pos++;
       const exp = parseAtom();
+      if (Math.abs(exp) > 1000) {
+        throw new Error(`Exponent too large: ${exp} (max 1000)`);
+      }
       base = Math.pow(base, exp);
     }
     return base;

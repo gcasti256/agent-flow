@@ -38,9 +38,7 @@ export class Agent {
     this.config = config;
     this.eventHandler = config.onEvent;
 
-    this.provider = config.provider
-      ? (config.provider as ModelProviderInterface)
-      : createModelProvider(config.model);
+    this.provider = config.provider ?? createModelProvider(config.model);
 
     if (config.tools) {
       for (const tool of config.tools) {
@@ -122,7 +120,25 @@ export class Agent {
 
       // Think: get model response
       const toolDefs = this.getToolDefinitions();
-      const response = await this.provider.chat(memory.getAll(), toolDefs);
+      let response;
+      try {
+        response = await this.provider.chat(memory.getAll(), toolDefs);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        logger.error(`Provider error on iteration ${iterations}: ${errorMsg}`);
+        this.emit({
+          type: 'agent:error',
+          agentId: this.id,
+          timestamp: Date.now(),
+          data: { error: errorMsg, iteration: iterations },
+        });
+        // Feed the error back as a system-level observation so the agent
+        // can see what happened, then break out of the loop.
+        return {
+          ...this.buildResult('error', memory, allToolResults, iterations, totalTokens, startTime),
+          error: `Provider error: ${errorMsg}`,
+        };
+      }
       totalTokens += response.usage?.totalTokens ?? 0;
 
       // If the model produced text content, add it

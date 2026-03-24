@@ -4,5 +4,5 @@
 
 export { calculatorTool } from './calculator.js';
 export { webSearchTool } from './web-search.js';
-export { fileReadTool, fileWriteTool } from './file-ops.js';
+export { fileReadTool, fileWriteTool, setFileOpsBasePath, getFileOpsBasePath } from './file-ops.js';
 export { httpRequestTool } from './http-request.js';
