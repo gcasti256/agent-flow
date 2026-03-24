@@ -22,5 +22,4 @@ COPY --from=builder /app/dist ./dist
 RUN addgroup --system agent && adduser --system --ingroup agent agent
 USER agent
 
-ENTRYPOINT ["node"]
-CMD ["dist/index.js"]
+CMD ["node", "dist/index.js"]
