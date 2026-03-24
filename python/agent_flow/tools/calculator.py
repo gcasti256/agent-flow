@@ -40,6 +40,9 @@ def calculator(expression: str) -> dict[str, Any]:
     Returns:
         Dict with expression and result
     """
-    tree = ast.parse(expression, mode="eval")
+    try:
+        tree = ast.parse(expression, mode="eval")
+    except SyntaxError as e:
+        raise ValueError(f"Invalid expression: {expression}") from e
     result = _safe_eval(tree.body)
     return {"expression": expression, "result": result}
